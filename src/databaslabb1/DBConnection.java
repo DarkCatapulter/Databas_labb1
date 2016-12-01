@@ -26,7 +26,7 @@ public class DBConnection {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             //java.sql.Driver d=new com.mysql.jdbc.Driver();
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dblabb1", "dblabb1", "FatihSover");
+            con = DriverManager.getConnection("jdbc:mysql://130.229.132.234:3306/dblabb1?useUnicode=true&characterEncoding=UTF-8", "dblabb1", "FatihSover");
             System.out.println("Connected!");
 
         } /*finally {
