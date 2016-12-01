@@ -56,6 +56,7 @@ public class FXMLDocumentController implements Initializable {
 
             DefinedStatements dstm = new DefinedStatements(dbcon);
             if (dstm.login(Email.getText(), Password.getText()) == true) {
+                dbcon.close();
                 Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
                 Scene scene = new Scene(root);
                 Stage stage = new Stage();

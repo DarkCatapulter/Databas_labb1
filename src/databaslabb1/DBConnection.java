@@ -41,6 +41,17 @@ public class DBConnection {
         }
     }
 
+    public void close() {
+        try {
+            if (con != null) {
+                con.close();
+                System.out.println("Connection closed.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
     public void executeQuery(String query) throws SQLException {
         Statement stmt = null;
         try {             // Execute the SQL statement             
