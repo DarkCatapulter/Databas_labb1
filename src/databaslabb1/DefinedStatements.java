@@ -58,7 +58,7 @@ public class DefinedStatements {
        ArrayList<Content> tmpArr = new ArrayList<>();
         try {
             PreparedStatement stmt = dbcon.con.prepareStatement("SELECT * FROM ("
-                    + "SELECT content.ContentID, content.Type, content.Title, content.AddedBy, content.ReleaseDate, GROUP_CONCAT(DISTINCT creator.CreatorID) AS creatorID, GROUP_CONCAT(DISTINCT contentgenre.Genre) AS genre, GROUP_CONCAT(DISTINCT creator.Name) AS creatorName, AVG(review.Score) AS avgScore FROM content, contentgenre, madeby, creator, review WHERE content.contentID = contentgenre.contentID AND( madeby.contentID = content.contentID AND creator.creatorID = madeby.creatorID ) AND content.ContentID = review.ContentID GROUP BY content.ContentID) "
+                    + "SELECT content.ContentID, content.Type, content.Title, content.AddedBy, content.ReleaseDate, GROUP_CONCAT(DISTINCT creator.CreatorID) AS creatorID, GROUP_CONCAT(DISTINCT creator.Role) AS creatorRole, GROUP_CONCAT(DISTINCT creator.Nation) AS creatorNations, GROUP_CONCAT(DISTINCT creator.AddedBy) AS creatorAddedBy, GROUP_CONCAT(DISTINCT contentgenre.Genre) AS genre, GROUP_CONCAT(DISTINCT creator.Name) AS creatorName, AVG(review.Score) AS avgScore FROM content, contentgenre, madeby, creator, review WHERE content.contentID = contentgenre.contentID AND( madeby.contentID = content.contentID AND creator.creatorID = madeby.creatorID ) AND content.ContentID = review.ContentID GROUP BY content.ContentID) "
                     + "WHERE Title LIKE '%?%' OR genre LIKE '%?%' OR creatorName LIKE '%?%' OR avgScore LIKE '?%'");
             stmt.setString(1, title);
             stmt.setString(2, genre);
@@ -67,7 +67,17 @@ public class DefinedStatements {
             ResultSet rs = stmt.executeQuery();
             
             while(rs.next()){
-                Content tmp = new Content(rs.getShort("ContentID"), null, rs.getString("Title"), rs.getInt("ReleaseDate"), rs.getString("AddedBy"));
+                String[] creatorIDs = rs.getString("CreatorID").split(",");
+                String[] creatorNames = rs.getString("CreatorName").split(",");
+                String[] creatorRoles = rs.getString("CreatorRole").split(",");
+                String[] creatorNations = rs.getString("CreatorNations").split(",");
+                String[] creatorAddedBy = rs.getString("CreatorAddedBy").split(",");
+                Content tmp = new Content(rs.getShort("ContentID"), ContentType.valueOf(rs.getString("Type")), rs.getString("Title"), rs.getInt("ReleaseDate"), rs.getString("AddedBy"));
+                int i = 0;
+                for (String creatorID : creatorIDs) {
+                    tmp.addCreator(new Creator(Integer.parseInt(creatorID), creatorNames[i], creatorRoles[i], creatorNations[i], creatorAddedBy[i]));
+                    i++;
+                }
                 tmpArr.add(tmp);
             }
             
