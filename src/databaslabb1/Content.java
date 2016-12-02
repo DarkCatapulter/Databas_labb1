@@ -15,7 +15,8 @@ public class Content {
     int contentID, timestamp;
     ContentType type;
     String title, addedBy;
-    ArrayList<String> genre, creator;
+    ArrayList<String> genre;
+    ArrayList<Creator> creators;
 
     public Content(int contentID, ContentType type, String title, int releaseDate, String addedBy) {
         this.contentID = contentID;
@@ -23,6 +24,21 @@ public class Content {
         this.type = type;
         this.title = title;
         this.addedBy = addedBy;
+    }
+    
+    public void addCreator(Creator creator){
+        creators.add(creator);
+    }
+    
+    public Creator removeCreator(int index){
+        return creators.remove(index);
+    }
+    
+    public boolean removeCreator(Creator creator){
+        return creators.remove(creator);
+    }
+    public ArrayList<Creator> getCreators(){
+        return (ArrayList<Creator>)creators.clone();
     }
     
 }

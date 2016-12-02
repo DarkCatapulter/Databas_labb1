@@ -54,14 +54,17 @@ public class DefinedStatements {
         }     
     }
     
-    public ArrayList<Content> getAllContent(){
+    public ArrayList<Content> searchContent(String title, String genre, String creator, int rating){
        ArrayList<Content> tmpArr = new ArrayList<>();
         try {
-            Statement stmt = dbcon.con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT content.ContentID, content.Type, content.Title, content.AddedBy,  content.ReleaseDate, GROUP_CONCAT(DISTINCT creator.CreatorID) AS creatorID, GROUP_CONCAT(DISTINCT contentgenre.Genre) AS genre "
-                    + "FROM content, contentgenre, madeby, creator "
-                    + "WHERE content.contentID = contentgenre.contentID AND (madeby.contentID = content.contentID AND creator.creatorID = madeby.creatorID) "
-                    + "GROUP BY content.ContentID;");
+            PreparedStatement stmt = dbcon.con.prepareStatement("SELECT * FROM ("
+                    + "SELECT content.ContentID, content.Type, content.Title, content.AddedBy, content.ReleaseDate, GROUP_CONCAT(DISTINCT creator.CreatorID) AS creatorID, GROUP_CONCAT(DISTINCT contentgenre.Genre) AS genre, GROUP_CONCAT(DISTINCT creator.Name) AS creatorName, AVG(review.Score) AS avgScore FROM content, contentgenre, madeby, creator, review WHERE content.contentID = contentgenre.contentID AND( madeby.contentID = content.contentID AND creator.creatorID = madeby.creatorID ) AND content.ContentID = review.ContentID GROUP BY content.ContentID) "
+                    + "WHERE Title LIKE '%?%' OR genre LIKE '%?%' OR creatorName LIKE '%?%' OR avgScore LIKE '?%'");
+            stmt.setString(1, title);
+            stmt.setString(2, genre);
+            stmt.setString(3, creator);
+            stmt.setInt(4, rating);
+            ResultSet rs = stmt.executeQuery();
             
             while(rs.next()){
                 Content tmp = new Content(rs.getShort("ContentID"), null, rs.getString("Title"), rs.getInt("ReleaseDate"), rs.getString("AddedBy"));
